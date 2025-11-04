@@ -116,6 +116,8 @@ const translation = {
     generalTip: '通用文本分块模式，检索和召回的块是相同的',
     parentChild: '父子分段',
     parentChildTip: '使用父子模式时，子块用于检索，父块用作上下文',
+    semantic: '语义分段',
+    semanticTip: '基于语义相似度对文本进行智能分段，保持语义的连贯性和完整性',
     parentChunkForContext: '父块用作上下文',
     childChunkForRetrieval: '子块用于检索',
     paragraph: '段落',

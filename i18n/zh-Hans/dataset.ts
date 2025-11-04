@@ -3,6 +3,7 @@ const translation = {
   chunkingMode: {
     general: '通用',
     parentChild: '父子',
+    semantic: '语义',
     qa: '问答',
     graph: '图',
   },

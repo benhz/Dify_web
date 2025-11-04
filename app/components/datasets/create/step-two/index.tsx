@@ -212,6 +212,9 @@ const StepTwo = ({
     if (value === ChunkingMode.parentChild && indexType === IndexingType.ECONOMICAL)
       setIndexType(IndexingType.QUALIFIED)
 
+    if (value === ChunkingMode.semantic && indexType === IndexingType.ECONOMICAL)
+      setIndexType(IndexingType.QUALIFIED)
+
     setDocForm(value)
 
     if (value === ChunkingMode.parentChild)
@@ -846,6 +849,73 @@ const StepTwo = ({
                 </div>
               </div>
               <div>
+                <div className='flex items-center gap-x-2'>
+                  <div className='inline-flex shrink-0'>
+                    <TextLabel>{t('datasetCreation.stepTwo.rules')}</TextLabel>
+                  </div>
+                  <Divider className='grow' bgStyle='gradient' />
+                </div>
+                <div className='mt-1'>
+                  {rules.map(rule => (
+                    <div key={rule.id} className={s.ruleItem} onClick={() => {
+                      ruleChangeHandle(rule.id)
+                    }}>
+                      <Checkbox
+                        checked={rule.enabled}
+                      />
+                      <label className="system-sm-regular ml-2 cursor-pointer text-text-secondary">{getRuleName(rule.id)}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </OptionCard>}
+        {
+          (
+            (isInUpload && currentDataset!.doc_form === ChunkingMode.semantic)
+            || isUploadInEmptyDataset
+            || isInInit
+          )
+          && <OptionCard
+            className='mb-2 mt-2 bg-background-section'
+            title={t('datasetCreation.stepTwo.semantic')}
+            icon={<Image width={20} height={20} src={SettingCog} alt={t('datasetCreation.stepTwo.semantic')} />}
+            activeHeaderClassName='bg-dataset-option-card-blue-gradient'
+            description={t('datasetCreation.stepTwo.semanticTip')}
+            isActive={currentDocForm === ChunkingMode.semantic}
+            onSwitched={() => handleChangeDocform(ChunkingMode.semantic)}
+            actions={
+              <>
+                <Button variant={'secondary-accent'} onClick={() => updatePreview()}>
+                  <RiSearchEyeLine className='mr-0.5 h-4 w-4' />
+                  {t('datasetCreation.stepTwo.previewChunk')}
+                </Button>
+                <Button variant={'ghost'} onClick={resetRules}>
+                  {t('datasetCreation.stepTwo.reset')}
+                </Button>
+              </>
+            }
+            noHighlight={isInUpload && isNotUploadInEmptyDataset}
+          >
+            <div className='flex flex-col gap-y-4'>
+              <div className='flex gap-3'>
+                <DelimiterInput
+                  value={segmentIdentifier}
+                  onChange={e => setSegmentIdentifier(e.target.value, true)}
+                />
+                <MaxLengthInput
+                  unit='characters'
+                  value={maxChunkLength}
+                  onChange={setMaxChunkLength}
+                />
+                <OverlapInput
+                  unit='characters'
+                  value={overlap}
+                  min={1}
+                  onChange={setOverlap}
+                />
+              </div>
+              <div className='flex w-full flex-col'>
                 <div className='flex items-center gap-x-2'>
                   <div className='inline-flex shrink-0'>
                     <TextLabel>{t('datasetCreation.stepTwo.rules')}</TextLabel>

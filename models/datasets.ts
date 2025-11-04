@@ -24,6 +24,7 @@ export enum ChunkingMode {
   text = 'text_model', // General text
   qa = 'qa_model', // General QA
   parentChild = 'hierarchical_model', // Parent-Child
+  semantic = 'semantic_model', // Semantic
   // graph = 'graph', // todo: Graph RAG
 }
 
@@ -774,20 +775,23 @@ export const DOC_FORM_ICON_WITH_BG: Record<ChunkingMode | 'external', React.Comp
   [ChunkingMode.text]: General,
   [ChunkingMode.qa]: Qa,
   [ChunkingMode.parentChild]: ParentChild,
+  [ChunkingMode.semantic]: General, // Reuse General icon for now
   // [ChunkingMode.graph]: Graph, // todo: Graph RAG
   external: ExternalKnowledgeBase,
 }
 
-export const DOC_FORM_ICON: Record<ChunkingMode.text | ChunkingMode.qa | ChunkingMode.parentChild, React.ComponentType<{ className: string }>> = {
+export const DOC_FORM_ICON: Record<ChunkingMode.text | ChunkingMode.qa | ChunkingMode.parentChild | ChunkingMode.semantic, React.ComponentType<{ className: string }>> = {
   [ChunkingMode.text]: GeneralChunk,
   [ChunkingMode.qa]: QuestionAndAnswer,
   [ChunkingMode.parentChild]: ParentChildChunk,
+  [ChunkingMode.semantic]: GeneralChunk, // Reuse GeneralChunk icon for now
 }
 
 export const DOC_FORM_TEXT: Record<ChunkingMode, string> = {
   [ChunkingMode.text]: 'general',
   [ChunkingMode.qa]: 'qa',
   [ChunkingMode.parentChild]: 'parentChild',
+  [ChunkingMode.semantic]: 'semantic',
   // [ChunkingMode.graph]: 'graph', // todo: Graph RAG
 }
 
