@@ -121,7 +121,7 @@ export const ThresholdAmountInput: FC<{ value: number; onChange: (value: number)
       <div className='relative'>
         <input
           value={value}
-          className='block h-8 w-16 shrink-0 appearance-none rounded-lg bg-components-input-bg-normal pl-3 pr-6 text-[13px] text-components-input-text-filled outline-none'
+          className='block h-8 w-20 shrink-0 appearance-none rounded-lg bg-components-input-bg-normal pl-3 pr-7 text-[13px] text-components-input-text-filled outline-none'
           type='number'
           min={80}
           max={99}
@@ -183,7 +183,7 @@ export const BufferSentencesInput: FC<{ value: number; onChange: (value: number)
       <div className='relative'>
         <input
           value={value}
-          className='block h-8 w-16 shrink-0 appearance-none rounded-lg bg-components-input-bg-normal pl-3 pr-6 text-[13px] text-components-input-text-filled outline-none'
+          className='block h-8 w-20 shrink-0 appearance-none rounded-lg bg-components-input-bg-normal pl-3 pr-8 text-[13px] text-components-input-text-filled outline-none'
           type='number'
           min={0}
           max={5}

@@ -45,11 +45,12 @@ export const InputNumber: FC<InputNumberProps> = (props) => {
   const inc = () => {
     if (disabled) return
 
-    if (value === undefined) {
-      onChange(defaultValue ?? 0)
+    if (value === undefined || value === '' || value === null) {
+      onChange(defaultValue ?? min ?? 0)
       return
     }
-    const newValue = value + amount
+    const currentValue = Number(value)
+    const newValue = currentValue + amount
     if (!isValidValue(newValue))
       return
     onChange(newValue)
@@ -57,11 +58,12 @@ export const InputNumber: FC<InputNumberProps> = (props) => {
   const dec = () => {
     if (disabled) return
 
-    if (value === undefined) {
-      onChange(defaultValue ?? 0)
+    if (value === undefined || value === '' || value === null) {
+      onChange(defaultValue ?? min ?? 0)
       return
     }
-    const newValue = value - amount
+    const currentValue = Number(value)
+    const newValue = currentValue - amount
     if (!isValidValue(newValue))
       return
     onChange(newValue)
@@ -69,28 +71,49 @@ export const InputNumber: FC<InputNumberProps> = (props) => {
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value === '') {
-      onChange(0)
+      // Allow empty value during editing, will be validated on blur
+      onChange('' as any)
       return
     }
     const parsed = Number(e.target.value)
     if (Number.isNaN(parsed))
       return
 
-    if (!isValidValue(parsed))
-      return
+    // Allow invalid values during editing, will be validated on blur
     onChange(parsed)
-  }, [isValidValue, onChange])
+  }, [onChange])
+
+  const handleBlur = useCallback(() => {
+    // Validate and correct the value on blur
+    if (value === '' || value === undefined || value === null) {
+      onChange(defaultValue ?? min ?? 0)
+      return
+    }
+    const numValue = Number(value)
+    if (Number.isNaN(numValue)) {
+      onChange(defaultValue ?? min ?? 0)
+      return
+    }
+    if (typeof max === 'number' && numValue > max) {
+      onChange(max)
+      return
+    }
+    if (typeof min === 'number' && numValue < min) {
+      onChange(min)
+    }
+  }, [value, defaultValue, min, max, onChange])
 
   return <div className={classNames('flex', wrapClassName)}>
     <Input {...rest}
       // disable default controller
       type='number'
       className={classNames('no-spinner rounded-r-none', className)}
-      value={value ?? 0}
+      value={value === '' ? '' : (value ?? 0)}
       max={max}
       min={min}
       disabled={disabled}
       onChange={handleInputChange}
+      onBlur={handleBlur}
       unit={unit}
       size={size}
     />
