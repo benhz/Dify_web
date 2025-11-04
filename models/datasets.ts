@@ -282,6 +282,15 @@ export type Segmentation = {
   separator: string
   max_tokens: number
   chunk_overlap?: number
+  // Semantic segmentation parameters
+  threshold_amount?: number
+  buffer_size?: number
+  target_chunk_tokens?: number
+  chunk_overlap_tokens?: number
+  min_chunk_tokens?: number
+  max_chunk_tokens?: number
+  similarity_metric?: string
+  threshold_type?: string
 }
 
 export const DocumentIndexingStatusList = [

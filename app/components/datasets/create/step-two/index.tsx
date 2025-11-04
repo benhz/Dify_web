@@ -27,7 +27,7 @@ import unescape from './unescape'
 import escape from './escape'
 import { OptionCard } from './option-card'
 import LanguageSelect from './language-select'
-import { DelimiterInput, MaxLengthInput, OverlapInput } from './inputs'
+import { BufferSizeInput, ChunkOverlapTokensInput, DelimiterInput, MaxChunkTokensInput, MaxLengthInput, MinChunkTokensInput, OverlapInput, TargetChunkTokensInput, ThresholdAmountInput } from './inputs'
 import cn from '@/utils/classnames'
 import type { CrawlOptions, CrawlResultItem, CreateDocumentReq, CustomFile, DocumentItem, FullDocumentDetail, ParentMode, PreProcessingRule, ProcessRule, Rules, createDocumentResponse } from '@/models/datasets'
 import { ChunkingMode, DataSourceType, ProcessMode } from '@/models/datasets'
@@ -175,6 +175,16 @@ const StepTwo = ({
   const [overlap, setOverlap] = useState(DEFAULT_OVERLAP)
   const [rules, setRules] = useState<PreProcessingRule[]>([])
   const [defaultConfig, setDefaultConfig] = useState<Rules>()
+
+  // Semantic segmentation parameters
+  const [thresholdAmount, setThresholdAmount] = useState<number>(0.5)
+  const [bufferSize, setBufferSize] = useState<number>(1)
+  const [targetChunkTokens, setTargetChunkTokens] = useState<number>(512)
+  const [chunkOverlapTokens, setChunkOverlapTokens] = useState<number>(50)
+  const [minChunkTokens, setMinChunkTokens] = useState<number>(100)
+  const [maxChunkTokens, setMaxChunkTokens] = useState<number>(1024)
+  const [similarityMetric] = useState<string>('cosine') // default to cosine
+  const [thresholdType] = useState<string>('percentile') // default to percentile
   const hasSetIndexType = !!indexingType
   const [indexType, setIndexType] = useState<IndexingType>(() => {
     if (hasSetIndexType)
@@ -253,6 +263,27 @@ const StepTwo = ({
           },
         },
         mode: 'hierarchical',
+      } as ProcessRule
+    }
+    if (currentDocForm === ChunkingMode.semantic) {
+      return {
+        rules: {
+          pre_processing_rules: rules,
+          segmentation: {
+            separator: unescape(segmentIdentifier),
+            max_tokens: maxChunkLength,
+            chunk_overlap: overlap,
+            threshold_amount: thresholdAmount,
+            buffer_size: bufferSize,
+            target_chunk_tokens: targetChunkTokens,
+            chunk_overlap_tokens: chunkOverlapTokens,
+            min_chunk_tokens: minChunkTokens,
+            max_chunk_tokens: maxChunkTokens,
+            similarity_metric: similarityMetric,
+            threshold_type: thresholdType,
+          },
+        },
+        mode: segmentationType,
       } as ProcessRule
     }
     return {
@@ -383,6 +414,21 @@ const StepTwo = ({
       : {
         provider: defaultEmbeddingModel?.provider.provider || '',
         model: defaultEmbeddingModel?.model || '',
+      },
+  )
+
+  // LLM model for refinement
+  const { data: llmModelList } = useModelList(ModelTypeEnum.llm)
+  const { data: defaultLLMModel } = useDefaultModel(ModelTypeEnum.llm)
+  const [llmRefineModel, setLlmRefineModel] = useState<DefaultModel>(
+    currentDataset?.llm_refine_model
+      ? {
+        provider: currentDataset.llm_refine_model_provider,
+        model: currentDataset.llm_refine_model,
+      }
+      : {
+        provider: defaultLLMModel?.provider.provider || '',
+        model: defaultLLMModel?.model || '',
       },
   )
   const [retrievalConfig, setRetrievalConfig] = useState(currentDataset?.retrieval_model_dict || {
@@ -915,6 +961,34 @@ const StepTwo = ({
                   onChange={setOverlap}
                 />
               </div>
+              <div className='flex gap-3'>
+                <ThresholdAmountInput
+                  value={thresholdAmount}
+                  onChange={setThresholdAmount}
+                />
+                <BufferSizeInput
+                  value={bufferSize}
+                  onChange={setBufferSize}
+                />
+                <TargetChunkTokensInput
+                  value={targetChunkTokens}
+                  onChange={setTargetChunkTokens}
+                />
+              </div>
+              <div className='flex gap-3'>
+                <ChunkOverlapTokensInput
+                  value={chunkOverlapTokens}
+                  onChange={setChunkOverlapTokens}
+                />
+                <MinChunkTokensInput
+                  value={minChunkTokens}
+                  onChange={setMinChunkTokens}
+                />
+                <MaxChunkTokensInput
+                  value={maxChunkTokens}
+                  onChange={setMaxChunkTokens}
+                />
+              </div>
               <div className='flex w-full flex-col'>
                 <div className='flex items-center gap-x-2'>
                   <div className='inline-flex shrink-0'>
@@ -1043,6 +1117,27 @@ const StepTwo = ({
               modelList={embeddingModelList}
               onSelect={(model: DefaultModel) => {
                 setEmbeddingModel(model)
+              }}
+            />
+            {isModelAndRetrievalConfigDisabled && (
+              <div className='system-xs-medium mt-2 text-text-tertiary'>
+                {t('datasetCreation.stepTwo.indexSettingTip')}
+                <Link className='text-text-accent' href={`/datasets/${datasetId}/settings`}>{t('datasetCreation.stepTwo.datasetSettingLink')}</Link>
+              </div>
+            )}
+          </div>
+        )}
+        {/* LLM Refine model */}
+        {indexType === IndexingType.QUALIFIED && currentDocForm === ChunkingMode.semantic && (
+          <div className='mt-5'>
+            <div className={cn('system-md-semibold mb-1 text-text-secondary', datasetId && 'flex items-center justify-between')}>{t('datasetCreation.stepTwo.llmRefineModel')}</div>
+            <ModelSelector
+              readonly={isModelAndRetrievalConfigDisabled}
+              triggerClassName={isModelAndRetrievalConfigDisabled ? 'opacity-50' : ''}
+              defaultModel={llmRefineModel}
+              modelList={llmModelList}
+              onSelect={(model: DefaultModel) => {
+                setLlmRefineModel(model)
               }}
             />
             {isModelAndRetrievalConfigDisabled && (

@@ -77,3 +77,110 @@ export const OverlapInput: FC<InputNumberProps> = (props) => {
     />
   </FormField>
 }
+
+// Semantic segmentation specific inputs
+export const ThresholdAmountInput: FC<InputNumberProps> = (props) => {
+  const { t } = useTranslation()
+  return <FormField label={<div className='mb-1 flex items-center'>
+    <span className='system-sm-semibold'>{t('datasetCreation.stepTwo.thresholdAmount')}</span>
+    <Tooltip
+      popupContent={
+        <div className='max-w-[200px]'>
+          {t('datasetCreation.stepTwo.thresholdAmountTip')}
+        </div>
+      }
+    />
+  </div>}>
+    <InputNumber
+      type="number"
+      size='large'
+      placeholder={t('datasetCreation.stepTwo.thresholdAmount') || ''}
+      min={0}
+      max={1}
+      step={0.01}
+      {...props}
+    />
+  </FormField>
+}
+
+export const BufferSizeInput: FC<InputNumberProps> = (props) => {
+  const { t } = useTranslation()
+  return <FormField label={<div className='mb-1 flex items-center'>
+    <span className='system-sm-semibold'>{t('datasetCreation.stepTwo.bufferSize')}</span>
+    <Tooltip
+      popupContent={
+        <div className='max-w-[200px]'>
+          {t('datasetCreation.stepTwo.bufferSizeTip')}
+        </div>
+      }
+    />
+  </div>}>
+    <InputNumber
+      type="number"
+      size='large'
+      placeholder={t('datasetCreation.stepTwo.bufferSize') || ''}
+      min={0}
+      {...props}
+    />
+  </FormField>
+}
+
+export const TargetChunkTokensInput: FC<InputNumberProps> = (props) => {
+  const { t } = useTranslation()
+  return <FormField label={<div className='system-sm-semibold mb-1'>
+    {t('datasetCreation.stepTwo.targetChunkTokens')}
+  </div>}>
+    <InputNumber
+      type="number"
+      size='large'
+      placeholder={t('datasetCreation.stepTwo.targetChunkTokens') || ''}
+      min={1}
+      {...props}
+    />
+  </FormField>
+}
+
+export const ChunkOverlapTokensInput: FC<InputNumberProps> = (props) => {
+  const { t } = useTranslation()
+  return <FormField label={<div className='system-sm-semibold mb-1'>
+    {t('datasetCreation.stepTwo.chunkOverlapTokens')}
+  </div>}>
+    <InputNumber
+      type="number"
+      size='large'
+      placeholder={t('datasetCreation.stepTwo.chunkOverlapTokens') || ''}
+      min={0}
+      {...props}
+    />
+  </FormField>
+}
+
+export const MinChunkTokensInput: FC<InputNumberProps> = (props) => {
+  const { t } = useTranslation()
+  return <FormField label={<div className='system-sm-semibold mb-1'>
+    {t('datasetCreation.stepTwo.minChunkTokens')}
+  </div>}>
+    <InputNumber
+      type="number"
+      size='large'
+      placeholder={t('datasetCreation.stepTwo.minChunkTokens') || ''}
+      min={1}
+      {...props}
+    />
+  </FormField>
+}
+
+export const MaxChunkTokensInput: FC<InputNumberProps> = (props) => {
+  const { t } = useTranslation()
+  return <FormField label={<div className='system-sm-semibold mb-1'>
+    {t('datasetCreation.stepTwo.maxChunkTokens')}
+  </div>}>
+    <InputNumber
+      type="number"
+      size='large'
+      placeholder={t('datasetCreation.stepTwo.maxChunkTokens') || ''}
+      min={1}
+      {...props}
+    />
+  </FormField>
+}
