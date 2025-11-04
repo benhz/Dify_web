@@ -64,6 +64,9 @@ export type DataSet = {
   embedding_model: string
   embedding_model_provider: string
   embedding_available: boolean
+  // 👇 新增：精炼 LLM 模型字段
+  text_generation_model?: string
+  text_generation_model_provider?: string
   retrieval_model_dict: RetrievalConfig
   retrieval_model: RetrievalConfig
   tags: Tag[]
@@ -282,6 +285,11 @@ export type Segmentation = {
   separator: string
   max_tokens: number
   chunk_overlap?: number
+  // Semantic segmentation parameters
+  threshold_amount?: number // 阈值数值 (分位数百分比, 80-99)
+  buffer_size?: number // 缓冲区大小 (句数, 0-5)
+  min_chunk_tokens?: number // 最小块长度 (token, 50-500)
+  max_chunk_tokens?: number // 最大块长度 (token, 400-4000)
 }
 
 export const DocumentIndexingStatusList = [

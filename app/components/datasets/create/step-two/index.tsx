@@ -27,7 +27,7 @@ import unescape from './unescape'
 import escape from './escape'
 import { OptionCard } from './option-card'
 import LanguageSelect from './language-select'
-import { DelimiterInput, MaxLengthInput, OverlapInput } from './inputs'
+import { BufferSentencesInput, DelimiterInput, MaxLengthInput, MaxSegmentLengthInput, MinSegmentLengthInput, OverlapInput, ThresholdAmountInput } from './inputs'
 import cn from '@/utils/classnames'
 import type { CrawlOptions, CrawlResultItem, CreateDocumentReq, CustomFile, DocumentItem, FullDocumentDetail, ParentMode, PreProcessingRule, ProcessRule, Rules, createDocumentResponse } from '@/models/datasets'
 import { ChunkingMode, DataSourceType, ProcessMode } from '@/models/datasets'
@@ -175,6 +175,12 @@ const StepTwo = ({
   const [overlap, setOverlap] = useState(DEFAULT_OVERLAP)
   const [rules, setRules] = useState<PreProcessingRule[]>([])
   const [defaultConfig, setDefaultConfig] = useState<Rules>()
+
+  // Semantic segmentation parameters
+  const [thresholdAmount, setThresholdAmount] = useState<number>(95) // 阈值数值 (分位数百分比, 80-99)
+  const [bufferSize, setBufferSize] = useState<number>(2) // 缓冲区大小 (句数, 0-5)
+  const [minChunkTokens, setMinChunkTokens] = useState<number>(150) // 最小块长度 (token, 50-500)
+  const [maxChunkTokens, setMaxChunkTokens] = useState<number>(1000) // 最大块长度 (token, 400-4000)
   const hasSetIndexType = !!indexingType
   const [indexType, setIndexType] = useState<IndexingType>(() => {
     if (hasSetIndexType)
@@ -253,6 +259,23 @@ const StepTwo = ({
           },
         },
         mode: 'hierarchical',
+      } as ProcessRule
+    }
+    if (currentDocForm === ChunkingMode.semantic) {
+      return {
+        rules: {
+          pre_processing_rules: rules,
+          segmentation: {
+            separator: unescape(segmentIdentifier),
+            max_tokens: maxChunkLength,
+            chunk_overlap: overlap,
+            threshold_amount: thresholdAmount,
+            buffer_size: bufferSize,
+            min_chunk_tokens: minChunkTokens,
+            max_chunk_tokens: maxChunkTokens,
+          },
+        },
+        mode: segmentationType,
       } as ProcessRule
     }
     return {
@@ -385,7 +408,30 @@ const StepTwo = ({
         model: defaultEmbeddingModel?.model || '',
       },
   )
-  const [retrievalConfig, setRetrievalConfig] = useState(currentDataset?.retrieval_model_dict || {
+
+  // LLM model for refinement
+  const { data: llmModelList } = useModelList(ModelTypeEnum.textGeneration)
+  const { data: defaultLLMModel } = useDefaultModel(ModelTypeEnum.textGeneration)
+  const [llmRefineModel, setLlmRefineModel] = useState<DefaultModel>({
+    provider: '',
+    model: '',
+  })
+
+  useEffect(() => {
+    if (currentDataset?.text_generation_model && currentDataset?.text_generation_model_provider) {
+      setLlmRefineModel({
+        provider: currentDataset.text_generation_model_provider,
+        model: currentDataset.text_generation_model,
+      })
+    } else if (defaultLLMModel?.provider?.provider && defaultLLMModel?.model) {
+      setLlmRefineModel({
+        provider: defaultLLMModel.provider.provider,
+        model: defaultLLMModel.model,
+      })
+    }
+  }, [currentDataset, defaultLLMModel])
+
+  const [retrievalConfig, setRetrievalConfig] = useState<RetrievalConfig>(currentDataset?.retrieval_model_dict || {
     search_method: RETRIEVE_METHOD.semantic,
     reranking_enable: false,
     reranking_model: {
@@ -395,23 +441,13 @@ const StepTwo = ({
     top_k: 3,
     score_threshold_enabled: false,
     score_threshold: 0.5,
-  } as RetrievalConfig)
+  })
 
-  useEffect(() => {
-    if (currentDataset?.retrieval_model_dict)
-      return
-    setRetrievalConfig({
-      search_method: RETRIEVE_METHOD.semantic,
-      reranking_enable: !!isRerankDefaultModelValid,
-      reranking_model: {
-        reranking_provider_name: isRerankDefaultModelValid ? rerankDefaultModel?.provider.provider ?? '' : '',
-        reranking_model_name: isRerankDefaultModelValid ? rerankDefaultModel?.model ?? '' : '',
-      },
-      top_k: 3,
-      score_threshold_enabled: false,
-      score_threshold: 0.5,
-    })
-  }, [rerankDefaultModel, isRerankDefaultModelValid])
+  const isLlmRefineRequired = useCallback(() => {
+    return indexType === IndexingType.QUALIFIED && currentDocForm === ChunkingMode.semantic
+  }, [indexType, currentDocForm])
+
+  const isLlmRefineModelLoaded = !!llmRefineModel.provider && !!llmRefineModel.model
 
   const getCreationParams = () => {
     let params
@@ -899,20 +935,23 @@ const StepTwo = ({
           >
             <div className='flex flex-col gap-y-4'>
               <div className='flex gap-3'>
-                <DelimiterInput
-                  value={segmentIdentifier}
-                  onChange={e => setSegmentIdentifier(e.target.value, true)}
+                <ThresholdAmountInput
+                  value={thresholdAmount}
+                  onChange={setThresholdAmount}
                 />
-                <MaxLengthInput
-                  unit='characters'
-                  value={maxChunkLength}
-                  onChange={setMaxChunkLength}
+                <BufferSentencesInput
+                  value={bufferSize}
+                  onChange={setBufferSize}
                 />
-                <OverlapInput
-                  unit='characters'
-                  value={overlap}
-                  min={1}
-                  onChange={setOverlap}
+              </div>
+              <div className='flex gap-3'>
+                <MinSegmentLengthInput
+                  value={minChunkTokens}
+                  onChange={setMinChunkTokens}
+                />
+                <MaxSegmentLengthInput
+                  value={maxChunkTokens}
+                  onChange={setMaxChunkTokens}
                 />
               </div>
               <div className='flex w-full flex-col'>
@@ -994,7 +1033,9 @@ const StepTwo = ({
                     {
                       docForm === ChunkingMode.qa
                         ? t('datasetCreation.stepTwo.notAvailableForQA')
-                        : t('datasetCreation.stepTwo.notAvailableForParentChild')
+                        : docForm === ChunkingMode.semantic
+                          ? t('datasetCreation.stepTwo.notAvailableForSemantic')
+                          : t('datasetCreation.stepTwo.notAvailableForParentChild')
                     }
                   </div>
                 }
@@ -1045,6 +1086,35 @@ const StepTwo = ({
                 setEmbeddingModel(model)
               }}
             />
+            {isModelAndRetrievalConfigDisabled && (
+              <div className='system-xs-medium mt-2 text-text-tertiary'>
+                {t('datasetCreation.stepTwo.indexSettingTip')}
+                <Link className='text-text-accent' href={`/datasets/${datasetId}/settings`}>{t('datasetCreation.stepTwo.datasetSettingLink')}</Link>
+              </div>
+            )}
+          </div>
+        )}
+        {/* LLM Refine model */}
+        {indexType === IndexingType.QUALIFIED && currentDocForm === ChunkingMode.semantic && (
+          <div className='mt-5'>
+            <div className={cn('system-md-semibold mb-1 text-text-secondary', datasetId && 'flex items-center justify-between')}>{t('datasetCreation.stepTwo.llmRefineModel')}</div>
+            {isLlmRefineModelLoaded
+              ? (
+                <ModelSelector
+                  readonly={isModelAndRetrievalConfigDisabled}
+                  triggerClassName={isModelAndRetrievalConfigDisabled ? 'opacity-50' : ''}
+                  defaultModel={llmRefineModel}
+                  modelList={llmModelList}
+                  onSelect={(model: DefaultModel) => {
+                    setLlmRefineModel(model)
+                  }}
+                />
+              )
+              : (
+                <div className='flex h-9 items-center rounded-lg border border-divider-subtle bg-components-input-bg-normal px-3 text-sm text-text-tertiary'>
+                  {t('common.operation.loading')}...
+                </div>
+              )}
             {isModelAndRetrievalConfigDisabled && (
               <div className='system-xs-medium mt-2 text-text-tertiary'>
                 {t('datasetCreation.stepTwo.indexSettingTip')}
