@@ -27,7 +27,7 @@ import unescape from './unescape'
 import escape from './escape'
 import { OptionCard } from './option-card'
 import LanguageSelect from './language-select'
-import { BufferSizeInput, DelimiterInput, MaxChunkTokensInput, MaxLengthInput, MinChunkTokensInput, OverlapInput, ThresholdAmountInput } from './inputs'
+import { BufferSentencesInput, DelimiterInput, MaxLengthInput, MaxSegmentLengthInput, MinSegmentLengthInput, OverlapInput, ThresholdAmountInput } from './inputs'
 import cn from '@/utils/classnames'
 import type { CrawlOptions, CrawlResultItem, CreateDocumentReq, CustomFile, DocumentItem, FullDocumentDetail, ParentMode, PreProcessingRule, ProcessRule, Rules, createDocumentResponse } from '@/models/datasets'
 import { ChunkingMode, DataSourceType, ProcessMode } from '@/models/datasets'
@@ -419,7 +419,7 @@ const StepTwo = ({
 
   // Update llmRefineModel when defaultLLMModel is loaded
   useEffect(() => {
-    if (currentDataset?.llm_refine_model) {
+    if (currentDataset?.llm_refine_model && currentDataset.llm_refine_model_provider) {
       setLlmRefineModel({
         provider: currentDataset.llm_refine_model_provider,
         model: currentDataset.llm_refine_model,
@@ -432,6 +432,9 @@ const StepTwo = ({
       })
     }
   }, [defaultLLMModel, currentDataset])
+
+  // Check if llmRefineModel is properly loaded
+  const isLlmRefineModelLoaded = llmRefineModel.provider && llmRefineModel.model
   const [retrievalConfig, setRetrievalConfig] = useState(currentDataset?.retrieval_model_dict || {
     search_method: RETRIEVE_METHOD.semantic,
     reranking_enable: false,
@@ -946,38 +949,21 @@ const StepTwo = ({
           >
             <div className='flex flex-col gap-y-4'>
               <div className='flex gap-3'>
-                <DelimiterInput
-                  value={segmentIdentifier}
-                  onChange={e => setSegmentIdentifier(e.target.value, true)}
-                />
-                <MaxLengthInput
-                  unit='characters'
-                  value={maxChunkLength}
-                  onChange={setMaxChunkLength}
-                />
-                <OverlapInput
-                  unit='characters'
-                  value={overlap}
-                  min={1}
-                  onChange={setOverlap}
-                />
-              </div>
-              <div className='flex gap-3'>
                 <ThresholdAmountInput
                   value={thresholdAmount}
                   onChange={setThresholdAmount}
                 />
-                <BufferSizeInput
+                <BufferSentencesInput
                   value={bufferSize}
                   onChange={setBufferSize}
                 />
               </div>
               <div className='flex gap-3'>
-                <MinChunkTokensInput
+                <MinSegmentLengthInput
                   value={minChunkTokens}
                   onChange={setMinChunkTokens}
                 />
-                <MaxChunkTokensInput
+                <MaxSegmentLengthInput
                   value={maxChunkTokens}
                   onChange={setMaxChunkTokens}
                 />
@@ -1126,15 +1112,23 @@ const StepTwo = ({
         {indexType === IndexingType.QUALIFIED && currentDocForm === ChunkingMode.semantic && (
           <div className='mt-5'>
             <div className={cn('system-md-semibold mb-1 text-text-secondary', datasetId && 'flex items-center justify-between')}>{t('datasetCreation.stepTwo.llmRefineModel')}</div>
-            <ModelSelector
-              readonly={isModelAndRetrievalConfigDisabled}
-              triggerClassName={isModelAndRetrievalConfigDisabled ? 'opacity-50' : ''}
-              defaultModel={llmRefineModel}
-              modelList={llmModelList}
-              onSelect={(model: DefaultModel) => {
-                setLlmRefineModel(model)
-              }}
-            />
+            {isLlmRefineModelLoaded
+              ? (
+                <ModelSelector
+                  readonly={isModelAndRetrievalConfigDisabled}
+                  triggerClassName={isModelAndRetrievalConfigDisabled ? 'opacity-50' : ''}
+                  defaultModel={llmRefineModel}
+                  modelList={llmModelList}
+                  onSelect={(model: DefaultModel) => {
+                    setLlmRefineModel(model)
+                  }}
+                />
+              )
+              : (
+                <div className='flex h-9 items-center rounded-lg border border-divider-subtle bg-components-input-bg-normal px-3 text-sm text-text-tertiary'>
+                  {t('common.operation.loading')}...
+                </div>
+              )}
             {isModelAndRetrievalConfigDisabled && (
               <div className='system-xs-medium mt-2 text-text-tertiary'>
                 {t('datasetCreation.stepTwo.indexSettingTip')}
