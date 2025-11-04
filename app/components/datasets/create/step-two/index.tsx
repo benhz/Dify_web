@@ -27,7 +27,7 @@ import unescape from './unescape'
 import escape from './escape'
 import { OptionCard } from './option-card'
 import LanguageSelect from './language-select'
-import { BufferSizeInput, ChunkOverlapTokensInput, DelimiterInput, MaxChunkTokensInput, MaxLengthInput, MinChunkTokensInput, OverlapInput, TargetChunkTokensInput, ThresholdAmountInput } from './inputs'
+import { BufferSizeInput, DelimiterInput, MaxChunkTokensInput, MaxLengthInput, MinChunkTokensInput, OverlapInput, ThresholdAmountInput } from './inputs'
 import cn from '@/utils/classnames'
 import type { CrawlOptions, CrawlResultItem, CreateDocumentReq, CustomFile, DocumentItem, FullDocumentDetail, ParentMode, PreProcessingRule, ProcessRule, Rules, createDocumentResponse } from '@/models/datasets'
 import { ChunkingMode, DataSourceType, ProcessMode } from '@/models/datasets'
@@ -177,14 +177,10 @@ const StepTwo = ({
   const [defaultConfig, setDefaultConfig] = useState<Rules>()
 
   // Semantic segmentation parameters
-  const [thresholdAmount, setThresholdAmount] = useState<number>(0.5)
-  const [bufferSize, setBufferSize] = useState<number>(1)
-  const [targetChunkTokens, setTargetChunkTokens] = useState<number>(512)
-  const [chunkOverlapTokens, setChunkOverlapTokens] = useState<number>(50)
-  const [minChunkTokens, setMinChunkTokens] = useState<number>(100)
-  const [maxChunkTokens, setMaxChunkTokens] = useState<number>(1024)
-  const [similarityMetric] = useState<string>('cosine') // default to cosine
-  const [thresholdType] = useState<string>('percentile') // default to percentile
+  const [thresholdAmount, setThresholdAmount] = useState<number>(95) // 阈值数值 (分位数百分比, 80-99)
+  const [bufferSize, setBufferSize] = useState<number>(2) // 缓冲区大小 (句数, 0-5)
+  const [minChunkTokens, setMinChunkTokens] = useState<number>(150) // 最小块长度 (token, 50-500)
+  const [maxChunkTokens, setMaxChunkTokens] = useState<number>(1000) // 最大块长度 (token, 400-4000)
   const hasSetIndexType = !!indexingType
   const [indexType, setIndexType] = useState<IndexingType>(() => {
     if (hasSetIndexType)
@@ -275,12 +271,8 @@ const StepTwo = ({
             chunk_overlap: overlap,
             threshold_amount: thresholdAmount,
             buffer_size: bufferSize,
-            target_chunk_tokens: targetChunkTokens,
-            chunk_overlap_tokens: chunkOverlapTokens,
             min_chunk_tokens: minChunkTokens,
             max_chunk_tokens: maxChunkTokens,
-            similarity_metric: similarityMetric,
-            threshold_type: thresholdType,
           },
         },
         mode: segmentationType,
@@ -420,17 +412,26 @@ const StepTwo = ({
   // LLM model for refinement
   const { data: llmModelList } = useModelList(ModelTypeEnum.llm)
   const { data: defaultLLMModel } = useDefaultModel(ModelTypeEnum.llm)
-  const [llmRefineModel, setLlmRefineModel] = useState<DefaultModel>(
-    currentDataset?.llm_refine_model
-      ? {
+  const [llmRefineModel, setLlmRefineModel] = useState<DefaultModel>({
+    provider: '',
+    model: '',
+  })
+
+  // Update llmRefineModel when defaultLLMModel is loaded
+  useEffect(() => {
+    if (currentDataset?.llm_refine_model) {
+      setLlmRefineModel({
         provider: currentDataset.llm_refine_model_provider,
         model: currentDataset.llm_refine_model,
-      }
-      : {
-        provider: defaultLLMModel?.provider.provider || '',
-        model: defaultLLMModel?.model || '',
-      },
-  )
+      })
+    }
+    else if (defaultLLMModel?.provider?.provider && defaultLLMModel?.model) {
+      setLlmRefineModel({
+        provider: defaultLLMModel.provider.provider,
+        model: defaultLLMModel.model,
+      })
+    }
+  }, [defaultLLMModel, currentDataset])
   const [retrievalConfig, setRetrievalConfig] = useState(currentDataset?.retrieval_model_dict || {
     search_method: RETRIEVE_METHOD.semantic,
     reranking_enable: false,
@@ -970,16 +971,8 @@ const StepTwo = ({
                   value={bufferSize}
                   onChange={setBufferSize}
                 />
-                <TargetChunkTokensInput
-                  value={targetChunkTokens}
-                  onChange={setTargetChunkTokens}
-                />
               </div>
               <div className='flex gap-3'>
-                <ChunkOverlapTokensInput
-                  value={chunkOverlapTokens}
-                  onChange={setChunkOverlapTokens}
-                />
                 <MinChunkTokensInput
                   value={minChunkTokens}
                   onChange={setMinChunkTokens}
@@ -1068,7 +1061,9 @@ const StepTwo = ({
                     {
                       docForm === ChunkingMode.qa
                         ? t('datasetCreation.stepTwo.notAvailableForQA')
-                        : t('datasetCreation.stepTwo.notAvailableForParentChild')
+                        : docForm === ChunkingMode.semantic
+                          ? t('datasetCreation.stepTwo.notAvailableForSemantic')
+                          : t('datasetCreation.stepTwo.notAvailableForParentChild')
                     }
                   </div>
                 }

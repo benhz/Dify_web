@@ -283,14 +283,10 @@ export type Segmentation = {
   max_tokens: number
   chunk_overlap?: number
   // Semantic segmentation parameters
-  threshold_amount?: number
-  buffer_size?: number
-  target_chunk_tokens?: number
-  chunk_overlap_tokens?: number
-  min_chunk_tokens?: number
-  max_chunk_tokens?: number
-  similarity_metric?: string
-  threshold_type?: string
+  threshold_amount?: number // 阈值数值 (分位数百分比, 80-99)
+  buffer_size?: number // 缓冲区大小 (句数, 0-5)
+  min_chunk_tokens?: number // 最小块长度 (token, 50-500)
+  max_chunk_tokens?: number // 最大块长度 (token, 400-4000)
 }
 
 export const DocumentIndexingStatusList = [
