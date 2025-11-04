@@ -88,8 +88,9 @@ const DocumentList: FC<IDocumentListProps> = ({
   const router = useRouter()
   const datasetConfig = useDatasetDetailContext(s => s.dataset)
   const chunkingMode = datasetConfig?.doc_form
-  const isGeneralMode = chunkingMode !== ChunkingMode.parentChild
+  const isGeneralMode = chunkingMode !== ChunkingMode.parentChild && chunkingMode !== ChunkingMode.semantic
   const isQAMode = chunkingMode === ChunkingMode.qa
+  const isSemanticMode = chunkingMode === ChunkingMode.semantic
   const [sortField, setSortField] = useState<'name' | 'word_count' | 'hit_count' | 'created_at' | null>('created_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
@@ -406,6 +407,7 @@ const DocumentList: FC<IDocumentListProps> = ({
                   <ChunkingModeLabel
                     isGeneralMode={isGeneralMode}
                     isQAMode={isQAMode}
+                    isSemanticMode={isSemanticMode}
                   />
                 </td>
                 <td>{renderCount(doc.word_count)}</td>
