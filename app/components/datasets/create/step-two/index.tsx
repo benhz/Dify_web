@@ -410,32 +410,28 @@ const StepTwo = ({
   )
 
   // LLM model for refinement
-  const { data: llmModelList } = useModelList(ModelTypeEnum.llm)
-  const { data: defaultLLMModel } = useDefaultModel(ModelTypeEnum.llm)
+  const { data: llmModelList } = useModelList(ModelTypeEnum.textGeneration)
+  const { data: defaultLLMModel } = useDefaultModel(ModelTypeEnum.textGeneration)
   const [llmRefineModel, setLlmRefineModel] = useState<DefaultModel>({
     provider: '',
     model: '',
   })
 
-  // Update llmRefineModel when defaultLLMModel is loaded
   useEffect(() => {
-    if (currentDataset?.llm_refine_model && currentDataset.llm_refine_model_provider) {
+    if (currentDataset?.text_generation_model && currentDataset?.text_generation_model_provider) {
       setLlmRefineModel({
-        provider: currentDataset.llm_refine_model_provider,
-        model: currentDataset.llm_refine_model,
+        provider: currentDataset.text_generation_model_provider,
+        model: currentDataset.text_generation_model,
       })
-    }
-    else if (defaultLLMModel?.provider?.provider && defaultLLMModel?.model) {
+    } else if (defaultLLMModel?.provider?.provider && defaultLLMModel?.model) {
       setLlmRefineModel({
         provider: defaultLLMModel.provider.provider,
         model: defaultLLMModel.model,
       })
     }
-  }, [defaultLLMModel, currentDataset])
+  }, [currentDataset, defaultLLMModel])
 
-  // Check if llmRefineModel is properly loaded
-  const isLlmRefineModelLoaded = llmRefineModel.provider && llmRefineModel.model
-  const [retrievalConfig, setRetrievalConfig] = useState(currentDataset?.retrieval_model_dict || {
+  const [retrievalConfig, setRetrievalConfig] = useState<RetrievalConfig>(currentDataset?.retrieval_model_dict || {
     search_method: RETRIEVE_METHOD.semantic,
     reranking_enable: false,
     reranking_model: {
@@ -445,23 +441,13 @@ const StepTwo = ({
     top_k: 3,
     score_threshold_enabled: false,
     score_threshold: 0.5,
-  } as RetrievalConfig)
+  })
 
-  useEffect(() => {
-    if (currentDataset?.retrieval_model_dict)
-      return
-    setRetrievalConfig({
-      search_method: RETRIEVE_METHOD.semantic,
-      reranking_enable: !!isRerankDefaultModelValid,
-      reranking_model: {
-        reranking_provider_name: isRerankDefaultModelValid ? rerankDefaultModel?.provider.provider ?? '' : '',
-        reranking_model_name: isRerankDefaultModelValid ? rerankDefaultModel?.model ?? '' : '',
-      },
-      top_k: 3,
-      score_threshold_enabled: false,
-      score_threshold: 0.5,
-    })
-  }, [rerankDefaultModel, isRerankDefaultModelValid])
+  const isLlmRefineRequired = useCallback(() => {
+    return indexType === IndexingType.QUALIFIED && currentDocForm === ChunkingMode.semantic
+  }, [indexType, currentDocForm])
+
+  const isLlmRefineModelLoaded = !!llmRefineModel.provider && !!llmRefineModel.model
 
   const getCreationParams = () => {
     let params

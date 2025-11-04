@@ -64,6 +64,9 @@ export type DataSet = {
   embedding_model: string
   embedding_model_provider: string
   embedding_available: boolean
+  // 👇 新增：精炼 LLM 模型字段
+  text_generation_model?: string
+  text_generation_model_provider?: string
   retrieval_model_dict: RetrievalConfig
   retrieval_model: RetrievalConfig
   tags: Tag[]
