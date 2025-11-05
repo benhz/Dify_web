@@ -99,7 +99,7 @@ const getFileIndexingEstimateParamsForFile = ({
   textGenerationModel,
   textGenerationModelProvider,
 }: GetFileIndexingEstimateParamsOptionFile): IndexingEstimateParams => {
-  return {
+  const baseParams = {
     info_list: {
       data_source_type: dataSourceType,
       file_info_list: {
@@ -111,11 +111,20 @@ const getFileIndexingEstimateParamsForFile = ({
     doc_form: docForm,
     doc_language: docLanguage,
     dataset_id,
-    embedding_model: embeddingModel,
-    embedding_model_provider: embeddingModelProvider,
-    text_generation_model: textGenerationModel,
-    text_generation_model_provider: textGenerationModelProvider,
   }
+
+  // Only add model parameters for semantic segmentation
+  if (docForm === 'semantic_model') {
+    return {
+      ...baseParams,
+      embedding_model: embeddingModel,
+      embedding_model_provider: embeddingModelProvider,
+      text_generation_model: textGenerationModel,
+      text_generation_model_provider: textGenerationModelProvider,
+    }
+  }
+
+  return baseParams
 }
 
 export const useFetchFileIndexingEstimateForFile = (
@@ -150,7 +159,7 @@ const getFileIndexingEstimateParamsForNotion = ({
   textGenerationModel,
   textGenerationModelProvider,
 }: GetFileIndexingEstimateParamsOptionNotion): IndexingEstimateParams => {
-  return {
+  const baseParams = {
     info_list: {
       data_source_type: dataSourceType,
       notion_info_list: getNotionInfo(notionPages, credential_id),
@@ -160,11 +169,20 @@ const getFileIndexingEstimateParamsForNotion = ({
     doc_form: docForm,
     doc_language: docLanguage,
     dataset_id,
-    embedding_model: embeddingModel,
-    embedding_model_provider: embeddingModelProvider,
-    text_generation_model: textGenerationModel,
-    text_generation_model_provider: textGenerationModelProvider,
   }
+
+  // Only add model parameters for semantic segmentation
+  if (docForm === 'semantic_model') {
+    return {
+      ...baseParams,
+      embedding_model: embeddingModel,
+      embedding_model_provider: embeddingModelProvider,
+      text_generation_model: textGenerationModel,
+      text_generation_model_provider: textGenerationModelProvider,
+    }
+  }
+
+  return baseParams
 }
 
 export const useFetchFileIndexingEstimateForNotion = (
@@ -203,7 +221,7 @@ const getFileIndexingEstimateParamsForWeb = ({
   textGenerationModel,
   textGenerationModelProvider,
 }: GetFileIndexingEstimateParamsOptionWeb): IndexingEstimateParams => {
-  return {
+  const baseParams = {
     info_list: {
       data_source_type: dataSourceType,
       website_info_list: getWebsiteInfo({
@@ -218,11 +236,20 @@ const getFileIndexingEstimateParamsForWeb = ({
     doc_form: docForm,
     doc_language: docLanguage,
     dataset_id,
-    embedding_model: embeddingModel,
-    embedding_model_provider: embeddingModelProvider,
-    text_generation_model: textGenerationModel,
-    text_generation_model_provider: textGenerationModelProvider,
   }
+
+  // Only add model parameters for semantic segmentation
+  if (docForm === 'semantic_model') {
+    return {
+      ...baseParams,
+      embedding_model: embeddingModel,
+      embedding_model_provider: embeddingModelProvider,
+      text_generation_model: textGenerationModel,
+      text_generation_model_provider: textGenerationModelProvider,
+    }
+  }
+
+  return baseParams
 }
 
 export const useFetchFileIndexingEstimateForWeb = (
