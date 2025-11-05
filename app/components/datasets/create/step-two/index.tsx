@@ -1281,7 +1281,7 @@ const StepTwo = ({
               </ChunkContainer>
             ))
           )}
-          {currentDocForm === ChunkingMode.text && estimate?.preview && (
+          {(currentDocForm === ChunkingMode.text || currentDocForm === ChunkingMode.semantic) && estimate?.preview && (
             estimate?.preview.map((item, index) => (
               <ChunkContainer
                 key={item.content}
