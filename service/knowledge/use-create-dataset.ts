@@ -75,6 +75,10 @@ type GetFileIndexingEstimateParamsOptionBase = {
   indexingTechnique: IndexingType
   processRule: ProcessRule
   dataset_id: string
+  embeddingModel?: string
+  embeddingModelProvider?: string
+  textGenerationModel?: string
+  textGenerationModelProvider?: string
 }
 
 type GetFileIndexingEstimateParamsOptionFile = GetFileIndexingEstimateParamsOptionBase & {
@@ -90,8 +94,12 @@ const getFileIndexingEstimateParamsForFile = ({
   indexingTechnique,
   processRule,
   dataset_id,
+  embeddingModel,
+  embeddingModelProvider,
+  textGenerationModel,
+  textGenerationModelProvider,
 }: GetFileIndexingEstimateParamsOptionFile): IndexingEstimateParams => {
-  return {
+  const baseParams = {
     info_list: {
       data_source_type: dataSourceType,
       file_info_list: {
@@ -104,6 +112,19 @@ const getFileIndexingEstimateParamsForFile = ({
     doc_language: docLanguage,
     dataset_id,
   }
+
+  // Only add model parameters for semantic segmentation
+  if (docForm === 'semantic_model') {
+    return {
+      ...baseParams,
+      embedding_model: embeddingModel,
+      embedding_model_provider: embeddingModelProvider,
+      text_generation_model: textGenerationModel,
+      text_generation_model_provider: textGenerationModelProvider,
+    }
+  }
+
+  return baseParams
 }
 
 export const useFetchFileIndexingEstimateForFile = (
@@ -133,8 +154,12 @@ const getFileIndexingEstimateParamsForNotion = ({
   processRule,
   dataset_id,
   credential_id,
+  embeddingModel,
+  embeddingModelProvider,
+  textGenerationModel,
+  textGenerationModelProvider,
 }: GetFileIndexingEstimateParamsOptionNotion): IndexingEstimateParams => {
-  return {
+  const baseParams = {
     info_list: {
       data_source_type: dataSourceType,
       notion_info_list: getNotionInfo(notionPages, credential_id),
@@ -145,6 +170,19 @@ const getFileIndexingEstimateParamsForNotion = ({
     doc_language: docLanguage,
     dataset_id,
   }
+
+  // Only add model parameters for semantic segmentation
+  if (docForm === 'semantic_model') {
+    return {
+      ...baseParams,
+      embedding_model: embeddingModel,
+      embedding_model_provider: embeddingModelProvider,
+      text_generation_model: textGenerationModel,
+      text_generation_model_provider: textGenerationModelProvider,
+    }
+  }
+
+  return baseParams
 }
 
 export const useFetchFileIndexingEstimateForNotion = (
@@ -178,8 +216,12 @@ const getFileIndexingEstimateParamsForWeb = ({
   indexingTechnique,
   processRule,
   dataset_id,
+  embeddingModel,
+  embeddingModelProvider,
+  textGenerationModel,
+  textGenerationModelProvider,
 }: GetFileIndexingEstimateParamsOptionWeb): IndexingEstimateParams => {
-  return {
+  const baseParams = {
     info_list: {
       data_source_type: dataSourceType,
       website_info_list: getWebsiteInfo({
@@ -195,6 +237,19 @@ const getFileIndexingEstimateParamsForWeb = ({
     doc_language: docLanguage,
     dataset_id,
   }
+
+  // Only add model parameters for semantic segmentation
+  if (docForm === 'semantic_model') {
+    return {
+      ...baseParams,
+      embedding_model: embeddingModel,
+      embedding_model_provider: embeddingModelProvider,
+      text_generation_model: textGenerationModel,
+      text_generation_model_provider: textGenerationModelProvider,
+    }
+  }
+
+  return baseParams
 }
 
 export const useFetchFileIndexingEstimateForWeb = (

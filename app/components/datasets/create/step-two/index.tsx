@@ -301,6 +301,10 @@ const StepTwo = ({
     indexingTechnique: getIndexing_technique() as any,
     processRule: getProcessRule(),
     dataset_id: datasetId!,
+    embeddingModel: embeddingModel.model,
+    embeddingModelProvider: embeddingModel.provider,
+    textGenerationModel: llmRefineModel.model,
+    textGenerationModelProvider: llmRefineModel.provider,
   })
   const notionIndexingEstimateQuery = useFetchFileIndexingEstimateForNotion({
     docForm: currentDocForm,
@@ -311,6 +315,10 @@ const StepTwo = ({
     processRule: getProcessRule(),
     dataset_id: datasetId || '',
     credential_id: notionCredentialId,
+    embeddingModel: embeddingModel.model,
+    embeddingModelProvider: embeddingModel.provider,
+    textGenerationModel: llmRefineModel.model,
+    textGenerationModelProvider: llmRefineModel.provider,
   })
 
   const websiteIndexingEstimateQuery = useFetchFileIndexingEstimateForWeb({
@@ -324,6 +332,10 @@ const StepTwo = ({
     indexingTechnique: getIndexing_technique() as any,
     processRule: getProcessRule(),
     dataset_id: datasetId || '',
+    embeddingModel: embeddingModel.model,
+    embeddingModelProvider: embeddingModel.provider,
+    textGenerationModel: llmRefineModel.model,
+    textGenerationModelProvider: llmRefineModel.provider,
   })
 
   const currentEstimateMutation = dataSourceType === DataSourceType.FILE
