@@ -442,6 +442,10 @@ export type CreateDocumentReq = DocumentReq & {
 
 export type IndexingEstimateParams = DocumentReq & Partial<DataSource> & {
   dataset_id: string
+  embedding_model?: string
+  embedding_model_provider?: string
+  text_generation_model?: string
+  text_generation_model_provider?: string
 }
 
 export type DataSource = {

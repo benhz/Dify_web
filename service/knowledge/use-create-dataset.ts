@@ -75,6 +75,10 @@ type GetFileIndexingEstimateParamsOptionBase = {
   indexingTechnique: IndexingType
   processRule: ProcessRule
   dataset_id: string
+  embeddingModel?: string
+  embeddingModelProvider?: string
+  textGenerationModel?: string
+  textGenerationModelProvider?: string
 }
 
 type GetFileIndexingEstimateParamsOptionFile = GetFileIndexingEstimateParamsOptionBase & {
@@ -90,6 +94,10 @@ const getFileIndexingEstimateParamsForFile = ({
   indexingTechnique,
   processRule,
   dataset_id,
+  embeddingModel,
+  embeddingModelProvider,
+  textGenerationModel,
+  textGenerationModelProvider,
 }: GetFileIndexingEstimateParamsOptionFile): IndexingEstimateParams => {
   return {
     info_list: {
@@ -103,6 +111,10 @@ const getFileIndexingEstimateParamsForFile = ({
     doc_form: docForm,
     doc_language: docLanguage,
     dataset_id,
+    embedding_model: embeddingModel,
+    embedding_model_provider: embeddingModelProvider,
+    text_generation_model: textGenerationModel,
+    text_generation_model_provider: textGenerationModelProvider,
   }
 }
 
@@ -133,6 +145,10 @@ const getFileIndexingEstimateParamsForNotion = ({
   processRule,
   dataset_id,
   credential_id,
+  embeddingModel,
+  embeddingModelProvider,
+  textGenerationModel,
+  textGenerationModelProvider,
 }: GetFileIndexingEstimateParamsOptionNotion): IndexingEstimateParams => {
   return {
     info_list: {
@@ -144,6 +160,10 @@ const getFileIndexingEstimateParamsForNotion = ({
     doc_form: docForm,
     doc_language: docLanguage,
     dataset_id,
+    embedding_model: embeddingModel,
+    embedding_model_provider: embeddingModelProvider,
+    text_generation_model: textGenerationModel,
+    text_generation_model_provider: textGenerationModelProvider,
   }
 }
 
@@ -178,6 +198,10 @@ const getFileIndexingEstimateParamsForWeb = ({
   indexingTechnique,
   processRule,
   dataset_id,
+  embeddingModel,
+  embeddingModelProvider,
+  textGenerationModel,
+  textGenerationModelProvider,
 }: GetFileIndexingEstimateParamsOptionWeb): IndexingEstimateParams => {
   return {
     info_list: {
@@ -194,6 +218,10 @@ const getFileIndexingEstimateParamsForWeb = ({
     doc_form: docForm,
     doc_language: docLanguage,
     dataset_id,
+    embedding_model: embeddingModel,
+    embedding_model_provider: embeddingModelProvider,
+    text_generation_model: textGenerationModel,
+    text_generation_model_provider: textGenerationModelProvider,
   }
 }
 
