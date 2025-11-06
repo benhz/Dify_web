@@ -291,6 +291,43 @@ const StepTwo = ({
     } as ProcessRule
   }
 
+  // Embedding model initialization
+  const { data: embeddingModelList } = useModelList(ModelTypeEnum.textEmbedding)
+  const { data: defaultEmbeddingModel } = useDefaultModel(ModelTypeEnum.textEmbedding)
+  const [embeddingModel, setEmbeddingModel] = useState<DefaultModel>(
+    currentDataset?.embedding_model
+      ? {
+        provider: currentDataset.embedding_model_provider,
+        model: currentDataset.embedding_model,
+      }
+      : {
+        provider: defaultEmbeddingModel?.provider.provider || '',
+        model: defaultEmbeddingModel?.model || '',
+      },
+  )
+
+  // LLM model for refinement
+  const { data: llmModelList } = useModelList(ModelTypeEnum.textGeneration)
+  const { data: defaultLLMModel } = useDefaultModel(ModelTypeEnum.textGeneration)
+  const [llmRefineModel, setLlmRefineModel] = useState<DefaultModel>({
+    provider: '',
+    model: '',
+  })
+
+  useEffect(() => {
+    if (currentDataset?.text_generation_model && currentDataset?.text_generation_model_provider) {
+      setLlmRefineModel({
+        provider: currentDataset.text_generation_model_provider,
+        model: currentDataset.text_generation_model,
+      })
+    } else if (defaultLLMModel?.provider?.provider && defaultLLMModel?.model) {
+      setLlmRefineModel({
+        provider: defaultLLMModel.provider.provider,
+        model: defaultLLMModel.model,
+      })
+    }
+  }, [currentDataset, defaultLLMModel])
+
   const fileIndexingEstimateQuery = useFetchFileIndexingEstimateForFile({
     docForm: currentDocForm,
     docLanguage,
@@ -407,41 +444,6 @@ const StepTwo = ({
     defaultModel: rerankDefaultModel,
     currentModel: isRerankDefaultModelValid,
   } = useModelListAndDefaultModelAndCurrentProviderAndModel(ModelTypeEnum.rerank)
-  const { data: embeddingModelList } = useModelList(ModelTypeEnum.textEmbedding)
-  const { data: defaultEmbeddingModel } = useDefaultModel(ModelTypeEnum.textEmbedding)
-  const [embeddingModel, setEmbeddingModel] = useState<DefaultModel>(
-    currentDataset?.embedding_model
-      ? {
-        provider: currentDataset.embedding_model_provider,
-        model: currentDataset.embedding_model,
-      }
-      : {
-        provider: defaultEmbeddingModel?.provider.provider || '',
-        model: defaultEmbeddingModel?.model || '',
-      },
-  )
-
-  // LLM model for refinement
-  const { data: llmModelList } = useModelList(ModelTypeEnum.textGeneration)
-  const { data: defaultLLMModel } = useDefaultModel(ModelTypeEnum.textGeneration)
-  const [llmRefineModel, setLlmRefineModel] = useState<DefaultModel>({
-    provider: '',
-    model: '',
-  })
-
-  useEffect(() => {
-    if (currentDataset?.text_generation_model && currentDataset?.text_generation_model_provider) {
-      setLlmRefineModel({
-        provider: currentDataset.text_generation_model_provider,
-        model: currentDataset.text_generation_model,
-      })
-    } else if (defaultLLMModel?.provider?.provider && defaultLLMModel?.model) {
-      setLlmRefineModel({
-        provider: defaultLLMModel.provider.provider,
-        model: defaultLLMModel.model,
-      })
-    }
-  }, [currentDataset, defaultLLMModel])
 
   const [retrievalConfig, setRetrievalConfig] = useState<RetrievalConfig>(currentDataset?.retrieval_model_dict || {
     search_method: RETRIEVE_METHOD.semantic,
