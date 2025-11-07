@@ -6,7 +6,7 @@ import { API_PREFIX, APP_VERSION, CSRF_COOKIE_NAME, CSRF_HEADER_NAME, MARKETPLAC
 import Cookies from 'js-cookie'
 import { getWebAppAccessToken, getWebAppPassport } from './webapp-auth'
 
-const TIME_OUT = 100000
+const TIME_OUT = 1800000 // 30 minutes for semantic segmentation with embedding
 
 export const ContentType = {
   json: 'application/json',
