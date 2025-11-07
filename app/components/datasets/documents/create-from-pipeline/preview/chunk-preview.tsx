@@ -163,7 +163,7 @@ const ChunkPreview = ({
           </ChunkContainer>
         ))
       )}
-      {!isPending && currentDocForm === ChunkingMode.text && estimateData?.preview && (
+      {!isPending && (currentDocForm === ChunkingMode.text || currentDocForm === ChunkingMode.semantic) && estimateData?.preview && (
         estimateData?.preview.map((item, index) => (
           <ChunkContainer
             key={`${item.content}-${index}`}
