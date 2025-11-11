@@ -31,7 +31,7 @@ import type {
 } from '@/types/pipeline'
 import Cookies from 'js-cookie'
 import { getWebAppPassport } from './webapp-auth'
-const TIME_OUT = 100000
+const TIME_OUT = 1800000 // 30 minutes for semantic segmentation with embedding
 
 export type IOnDataMoreInfo = {
   conversationId?: string
