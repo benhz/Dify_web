@@ -199,7 +199,7 @@ const translation = {
     sentenceUnit: '句',
     minSegmentLength: '分段最小长度',
     maxSegmentLength: '分段最大长度',
-    llmRefineModel: 'LLM 精炼模型',
+    llmRefineModel: '图片识别模型',
   },
   stepThree: {
     creationTitle: '🎉 知识库已创建',

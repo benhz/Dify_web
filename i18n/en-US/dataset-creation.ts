@@ -197,7 +197,7 @@ const translation = {
     sentenceUnit: 'sentences',
     minSegmentLength: 'Min Segment Length',
     maxSegmentLength: 'Max Segment Length',
-    llmRefineModel: 'LLM Refine Model',
+    llmRefineModel: 'Image Recognition Model',
   },
   stepThree: {
     creationTitle: '🎉 Knowledge created',
