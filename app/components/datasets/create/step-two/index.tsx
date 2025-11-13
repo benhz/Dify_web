@@ -290,9 +290,6 @@ const StepTwo = ({
         rules: {
           pre_processing_rules: rules,
           segmentation: {
-            separator: unescape(segmentIdentifier),
-            max_tokens: maxChunkLength,
-            chunk_overlap: overlap,
             threshold_amount: thresholdAmount,
             buffer_size: bufferSize,
             min_chunk_tokens: minChunkTokens,
@@ -585,14 +582,35 @@ const StepTwo = ({
   const getRulesFromDetail = () => {
     if (documentDetail) {
       const rules = documentDetail.dataset_process_rule.rules
-      const separator = rules.segmentation.separator
-      const max = rules.segmentation.max_tokens
-      const overlap = rules.segmentation.chunk_overlap
       const isHierarchicalDocument = documentDetail.doc_form === ChunkingMode.parentChild
         || (rules.parent_mode && rules.subchunk_segmentation)
-      setSegmentIdentifier(separator)
-      setMaxChunkLength(max)
-      setOverlap(overlap!)
+      const isSemanticDocument = documentDetail.doc_form === ChunkingMode.semantic
+
+      // Only set traditional segmentation parameters for non-semantic documents
+      if (!isSemanticDocument) {
+        const separator = rules.segmentation.separator
+        const max = rules.segmentation.max_tokens
+        const overlap = rules.segmentation.chunk_overlap
+        setSegmentIdentifier(separator!)
+        setMaxChunkLength(max!)
+        setOverlap(overlap!)
+      }
+      else {
+        // For semantic documents, set semantic segmentation parameters
+        if (rules.segmentation.threshold_amount !== undefined)
+          setThresholdAmount(rules.segmentation.threshold_amount)
+        if (rules.segmentation.buffer_size !== undefined)
+          setBufferSize(rules.segmentation.buffer_size)
+        if (rules.segmentation.min_chunk_tokens !== undefined)
+          setMinChunkTokens(rules.segmentation.min_chunk_tokens)
+        if (rules.segmentation.max_chunk_tokens !== undefined)
+          setMaxChunkTokens(rules.segmentation.max_chunk_tokens)
+        if (rules.segmentation.image_recognition_enabled !== undefined)
+          setImageRecognitionEnabled(rules.segmentation.image_recognition_enabled)
+        if (rules.segmentation.pdf_recognition_enabled !== undefined)
+          setPdfRecognitionEnabled(rules.segmentation.pdf_recognition_enabled)
+      }
+
       setRules(rules.pre_processing_rules)
       setDefaultConfig(rules)
 
@@ -600,12 +618,12 @@ const StepTwo = ({
         setParentChildConfig({
           chunkForContext: rules.parent_mode || 'paragraph',
           parent: {
-            delimiter: escape(rules.segmentation.separator),
-            maxLength: rules.segmentation.max_tokens,
+            delimiter: escape(rules.segmentation.separator!),
+            maxLength: rules.segmentation.max_tokens!,
           },
           child: {
-            delimiter: escape(rules.subchunk_segmentation.separator),
-            maxLength: rules.subchunk_segmentation.max_tokens,
+            delimiter: escape(rules.subchunk_segmentation!.separator!),
+            maxLength: rules.subchunk_segmentation!.max_tokens!,
           },
         })
       }
