@@ -450,6 +450,8 @@ export type IndexingEstimateParams = DocumentReq & Partial<DataSource> & {
   embedding_model_provider?: string
   text_generation_model?: string
   text_generation_model_provider?: string
+  vision_model?: string
+  vision_model_provider?: string
 }
 
 export type DataSource = {

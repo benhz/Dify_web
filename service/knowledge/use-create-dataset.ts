@@ -79,6 +79,8 @@ type GetFileIndexingEstimateParamsOptionBase = {
   embeddingModelProvider?: string
   textGenerationModel?: string
   textGenerationModelProvider?: string
+  visionModel?: string
+  visionModelProvider?: string
 }
 
 type GetFileIndexingEstimateParamsOptionFile = GetFileIndexingEstimateParamsOptionBase & {
@@ -98,6 +100,8 @@ const getFileIndexingEstimateParamsForFile = ({
   embeddingModelProvider,
   textGenerationModel,
   textGenerationModelProvider,
+  visionModel,
+  visionModelProvider,
 }: GetFileIndexingEstimateParamsOptionFile): IndexingEstimateParams => {
   const baseParams = {
     info_list: {
@@ -121,6 +125,8 @@ const getFileIndexingEstimateParamsForFile = ({
       embedding_model_provider: embeddingModelProvider,
       text_generation_model: textGenerationModel,
       text_generation_model_provider: textGenerationModelProvider,
+      vision_model: visionModel,
+      vision_model_provider: visionModelProvider,
     }
   }
 
@@ -158,6 +164,8 @@ const getFileIndexingEstimateParamsForNotion = ({
   embeddingModelProvider,
   textGenerationModel,
   textGenerationModelProvider,
+  visionModel,
+  visionModelProvider,
 }: GetFileIndexingEstimateParamsOptionNotion): IndexingEstimateParams => {
   const baseParams = {
     info_list: {
@@ -179,6 +187,8 @@ const getFileIndexingEstimateParamsForNotion = ({
       embedding_model_provider: embeddingModelProvider,
       text_generation_model: textGenerationModel,
       text_generation_model_provider: textGenerationModelProvider,
+      vision_model: visionModel,
+      vision_model_provider: visionModelProvider,
     }
   }
 
@@ -220,6 +230,8 @@ const getFileIndexingEstimateParamsForWeb = ({
   embeddingModelProvider,
   textGenerationModel,
   textGenerationModelProvider,
+  visionModel,
+  visionModelProvider,
 }: GetFileIndexingEstimateParamsOptionWeb): IndexingEstimateParams => {
   const baseParams = {
     info_list: {
@@ -246,6 +258,8 @@ const getFileIndexingEstimateParamsForWeb = ({
       embedding_model_provider: embeddingModelProvider,
       text_generation_model: textGenerationModel,
       text_generation_model_provider: textGenerationModelProvider,
+      vision_model: visionModel,
+      vision_model_provider: visionModelProvider,
     }
   }
 
