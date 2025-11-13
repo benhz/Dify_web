@@ -290,6 +290,9 @@ export type Segmentation = {
   buffer_size?: number // 缓冲区大小 (句数, 0-5)
   min_chunk_tokens?: number // 最小块长度 (token, 50-500)
   max_chunk_tokens?: number // 最大块长度 (token, 400-4000)
+  // File type recognition options
+  image_recognition_enabled?: boolean // 图片识别 (Word文件)
+  pdf_recognition_enabled?: boolean // PDF识别 (PDF文件)
 }
 
 export const DocumentIndexingStatusList = [

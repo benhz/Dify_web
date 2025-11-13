@@ -181,6 +181,11 @@ const StepTwo = ({
   const [bufferSize, setBufferSize] = useState<number>(2) // 缓冲区大小 (句数, 0-5)
   const [minChunkTokens, setMinChunkTokens] = useState<number>(150) // 最小块长度 (token, 50-500)
   const [maxChunkTokens, setMaxChunkTokens] = useState<number>(1000) // 最大块长度 (token, 400-4000)
+
+  // File type recognition options
+  const [imageRecognitionEnabled, setImageRecognitionEnabled] = useState<boolean>(false) // 图片识别
+  const [pdfRecognitionEnabled, setPdfRecognitionEnabled] = useState<boolean>(false) // PDF识别
+
   const hasSetIndexType = !!indexingType
   const [indexType, setIndexType] = useState<IndexingType>(() => {
     if (hasSetIndexType)
@@ -238,6 +243,25 @@ const StepTwo = ({
 
   const [parentChildConfig, setParentChildConfig] = useState<ParentChildConfig>(defaultParentChildConfig)
 
+  // Check if files contain Word or PDF documents
+  const hasWordFiles = () => {
+    if (dataSourceType !== DataSourceType.FILE)
+      return false
+    return files.some(file => {
+      const ext = file.extension?.toLowerCase() || file.name.split('.').pop()?.toLowerCase()
+      return ext === 'doc' || ext === 'docx'
+    })
+  }
+
+  const hasPdfFiles = () => {
+    if (dataSourceType !== DataSourceType.FILE)
+      return false
+    return files.some(file => {
+      const ext = file.extension?.toLowerCase() || file.name.split('.').pop()?.toLowerCase()
+      return ext === 'pdf'
+    })
+  }
+
   const getIndexing_technique = () => indexingType || indexType
   const currentDocForm = currentDataset?.doc_form || docForm
 
@@ -273,6 +297,8 @@ const StepTwo = ({
             buffer_size: bufferSize,
             min_chunk_tokens: minChunkTokens,
             max_chunk_tokens: maxChunkTokens,
+            image_recognition_enabled: imageRecognitionEnabled,
+            pdf_recognition_enabled: pdfRecognitionEnabled,
           },
         },
         mode: segmentationType,
@@ -988,6 +1014,39 @@ const StepTwo = ({
                   ))}
                 </div>
               </div>
+              {/* File type recognition options */}
+              {(hasWordFiles() || hasPdfFiles()) && (
+                <div className='flex w-full flex-col'>
+                  <div className='flex items-center gap-x-2'>
+                    <div className='inline-flex shrink-0'>
+                      <TextLabel>文件类型识别选项</TextLabel>
+                    </div>
+                    <Divider className='grow' bgStyle='gradient' />
+                  </div>
+                  <div className='mt-1'>
+                    {hasWordFiles() && (
+                      <div className={s.ruleItem} onClick={() => {
+                        setImageRecognitionEnabled(!imageRecognitionEnabled)
+                      }}>
+                        <Checkbox
+                          checked={imageRecognitionEnabled}
+                        />
+                        <label className="system-sm-regular ml-2 cursor-pointer text-text-secondary">Word图片识别</label>
+                      </div>
+                    )}
+                    {hasPdfFiles() && (
+                      <div className={s.ruleItem} onClick={() => {
+                        setPdfRecognitionEnabled(!pdfRecognitionEnabled)
+                      }}>
+                        <Checkbox
+                          checked={pdfRecognitionEnabled}
+                        />
+                        <label className="system-sm-regular ml-2 cursor-pointer text-text-secondary">PDF识别</label>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </OptionCard>}
         <Divider className='my-5' />
