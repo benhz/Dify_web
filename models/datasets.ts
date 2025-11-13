@@ -282,10 +282,11 @@ export type PreProcessingRule = {
 }
 
 export type Segmentation = {
-  separator: string
-  max_tokens: number
+  // Traditional segmentation parameters (used for text_model, qa_model, hierarchical_model)
+  separator?: string
+  max_tokens?: number
   chunk_overlap?: number
-  // Semantic segmentation parameters
+  // Semantic segmentation parameters (used for semantic_model)
   threshold_amount?: number // 阈值数值 (分位数百分比, 80-99)
   buffer_size?: number // 缓冲区大小 (句数, 0-5)
   min_chunk_tokens?: number // 最小块长度 (token, 50-500)
@@ -449,6 +450,8 @@ export type IndexingEstimateParams = DocumentReq & Partial<DataSource> & {
   embedding_model_provider?: string
   text_generation_model?: string
   text_generation_model_provider?: string
+  vision_model?: string
+  vision_model_provider?: string
 }
 
 export type DataSource = {
