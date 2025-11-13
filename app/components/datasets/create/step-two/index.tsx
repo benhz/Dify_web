@@ -1191,10 +1191,10 @@ const StepTwo = ({
             )}
           </div>
         )}
-        {/* LLM Refine model */}
-        {indexType === IndexingType.QUALIFIED && currentDocForm === ChunkingMode.semantic && (
+        {/* Vision model for image recognition */}
+        {indexType === IndexingType.QUALIFIED && currentDocForm === ChunkingMode.semantic && imageRecognitionEnabled && hasWordFiles() && (
           <div className='mt-5'>
-            <div className={cn('system-md-semibold mb-1 text-text-secondary', datasetId && 'flex items-center justify-between')}>{t('datasetCreation.stepTwo.llmRefineModel')}</div>
+            <div className={cn('system-md-semibold mb-1 text-text-secondary', datasetId && 'flex items-center justify-between')}>图片识别模型</div>
             {isLlmRefineModelLoaded
               ? (
                 <ModelSelector
@@ -1212,11 +1212,6 @@ const StepTwo = ({
                   {t('common.operation.loading')}...
                 </div>
               )}
-            {imageRecognitionEnabled && hasWordFiles() && !isModelAndRetrievalConfigDisabled && (
-              <div className='system-xs-medium mt-2 text-text-tertiary'>
-                此模型也将用于Word文件的图片识别
-              </div>
-            )}
             {isModelAndRetrievalConfigDisabled && (
               <div className='system-xs-medium mt-2 text-text-tertiary'>
                 {t('datasetCreation.stepTwo.indexSettingTip')}
