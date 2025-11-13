@@ -351,21 +351,6 @@ const StepTwo = ({
     }
   }, [currentDataset, defaultLLMModel])
 
-  // Vision model for image recognition
-  const [visionModel, setVisionModel] = useState<DefaultModel>({
-    provider: '',
-    model: '',
-  })
-
-  useEffect(() => {
-    if (defaultLLMModel?.provider?.provider && defaultLLMModel?.model) {
-      setVisionModel({
-        provider: defaultLLMModel.provider.provider,
-        model: defaultLLMModel.model,
-      })
-    }
-  }, [defaultLLMModel])
-
   const fileIndexingEstimateQuery = useFetchFileIndexingEstimateForFile({
     docForm: currentDocForm,
     docLanguage,
@@ -380,8 +365,8 @@ const StepTwo = ({
     embeddingModelProvider: embeddingModel.provider,
     textGenerationModel: llmRefineModel.model,
     textGenerationModelProvider: llmRefineModel.provider,
-    visionModel: visionModel.model,
-    visionModelProvider: visionModel.provider,
+    visionModel: llmRefineModel.model,
+    visionModelProvider: llmRefineModel.provider,
   })
   const notionIndexingEstimateQuery = useFetchFileIndexingEstimateForNotion({
     docForm: currentDocForm,
@@ -396,8 +381,8 @@ const StepTwo = ({
     embeddingModelProvider: embeddingModel.provider,
     textGenerationModel: llmRefineModel.model,
     textGenerationModelProvider: llmRefineModel.provider,
-    visionModel: visionModel.model,
-    visionModelProvider: visionModel.provider,
+    visionModel: llmRefineModel.model,
+    visionModelProvider: llmRefineModel.provider,
   })
 
   const websiteIndexingEstimateQuery = useFetchFileIndexingEstimateForWeb({
@@ -415,8 +400,8 @@ const StepTwo = ({
     embeddingModelProvider: embeddingModel.provider,
     textGenerationModel: llmRefineModel.model,
     textGenerationModelProvider: llmRefineModel.provider,
-    visionModel: visionModel.model,
-    visionModelProvider: visionModel.provider,
+    visionModel: llmRefineModel.model,
+    visionModelProvider: llmRefineModel.provider,
   })
 
   const currentEstimateMutation = dataSourceType === DataSourceType.FILE
@@ -1084,19 +1069,6 @@ const StepTwo = ({
                       </div>
                     )}
                   </div>
-                  {/* Vision model selector for image recognition */}
-                  {imageRecognitionEnabled && hasWordFiles() && (
-                    <div className='mt-3'>
-                      <div className='system-sm-semibold mb-1 text-text-secondary'>图片识别模型</div>
-                      <ModelSelector
-                        defaultModel={visionModel}
-                        modelList={llmModelList}
-                        onSelect={(model: DefaultModel) => {
-                          setVisionModel(model)
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -1240,6 +1212,11 @@ const StepTwo = ({
                   {t('common.operation.loading')}...
                 </div>
               )}
+            {imageRecognitionEnabled && hasWordFiles() && !isModelAndRetrievalConfigDisabled && (
+              <div className='system-xs-medium mt-2 text-text-tertiary'>
+                此模型也将用于Word文件的图片识别
+              </div>
+            )}
             {isModelAndRetrievalConfigDisabled && (
               <div className='system-xs-medium mt-2 text-text-tertiary'>
                 {t('datasetCreation.stepTwo.indexSettingTip')}
